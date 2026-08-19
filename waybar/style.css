@@ -1,0 +1,248 @@
+@import url("/home/gaffer/.cache/wal/colors-waybar.css");
+/* CYBERPUNK WAYBAR THEME */
+/* ============================================================
+ *  CYBERPUNK WAYBAR THEME — Dynamic (Pywal)
+ *  ============================================================ */
+
+/* ── Global ───────────────────────────────────────────────── */
+* {
+    font-family: "Share Tech Mono", "JetBrains Mono Nerd Font", monospace;
+    font-size: 13px;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+}
+
+/* ── Window / Bar ─────────────────────────────────────────── */
+window#waybar {
+    background: transparent;
+    color: @foreground;
+}
+
+window#waybar.hidden {
+    opacity: 0.2;
+}
+
+/* ── Tooltip ──────────────────────────────────────────────── */
+tooltip {
+    background: @background;
+    border: 1px solid @color4;
+    border-radius: 4px;
+    color: @foreground;
+    padding: 6px 10px;
+}
+
+tooltip label {
+    color: @foreground;
+}
+
+/* ── Module Containers ────────────────────────────────────── */
+.modules-left,
+.modules-center,
+.modules-right {
+    background: alpha(@background, 0.92);
+    border: 1px solid alpha(@color4, 0.25);
+    border-radius: 8px;
+    padding: 2px 6px;
+    box-shadow:
+    0 0 10px alpha(@color4, 0.1),
+    inset 0 1px 0 alpha(@color4, 0.05);
+}
+
+/* ── All Modules ──────────────────────────────────────────── */
+#custom-logo,
+#custom-separator,
+#custom-power,
+#custom-media,
+#custom-time_left,
+#custom-time_right,
+#workspaces,
+#window,
+#clock,
+#network,
+#pulseaudio,
+#cpu,
+#memory,
+#battery,
+#tray,
+#bluetooth,
+#custom-clipboard {
+padding: 2px 10px;
+color: @foreground;
+transition: all 0.2s ease;
+}
+
+/* ── Logo ─────────────────────────────────────────────────── */
+#custom-logo {
+color: @color6;
+font-size: 16px;
+padding: 2px 12px 2px 8px;
+}
+
+/* ── Separator ────────────────────────────────────────────── */
+#custom-separator {
+color: alpha(@foreground,0.25);
+padding: 2px 4px;
+font-size: 11px;
+}
+
+/* ── Workspaces ───────────────────────────────────────────── */
+#workspaces {
+    padding: 0;
+}
+
+#workspaces button {
+    padding: 0 4px;
+    margin: 0 2px;
+    color: @color8;
+    background: transparent;
+    border-radius: 4px;
+    font-size: 14px;
+    min-width: 28px;
+}
+
+#workspaces button:hover {
+    color: @color6;
+    background: alpha(@color6,0.08);
+    box-shadow: 0 0 8px alpha(@color6,0.3);
+}
+
+#workspaces button.active {
+    color: @color6;
+    background: alpha(@color6,0.12);
+    box-shadow:
+    0 0 12px alpha(@color6,0.4),
+    inset 0 0 8px alpha(@color6,0.1);
+}
+
+#workspaces button.urgent {
+    color: @color1;
+    background: alpha(@color1,0.15);
+}
+
+/* ── Active Window ────────────────────────────────────────── */
+#window {
+    color: @color7;
+    font-size: 12px;
+    font-style: italic;
+}
+
+#window:hover {
+    color: @color3;
+}
+
+/* ── Center (Clock Section) ───────────────────────────────── */
+.modules-center {
+    border-color: alpha(@color5,0.3);
+    box-shadow:
+    0 0 14px alpha(@color5,0.15),
+    inset 0 1px 0 alpha(@color5,0.08);
+}
+
+#clock {
+color: @color5;
+font-size: 14px;
+font-weight: bold;
+letter-spacing: 2px;
+padding: 2px 14px;
+}
+
+#custom-time_left,
+#custom-time_right {
+color: alpha(@color5,0.5);
+font-size: 16px;
+padding: 0 2px;
+}
+
+/* ── Network ─────────────────────────────────────────────── */
+#network {
+color: @color2;
+}
+
+#network.disconnected {
+color: @color1;
+}
+
+/* ── Audio ───────────────────────────────────────────────── */
+#pulseaudio {
+color: @color5;
+}
+
+#pulseaudio.muted {
+color: @color8;
+}
+
+/* ── CPU ─────────────────────────────────────────────────── */
+#cpu {
+color: @color3;
+}
+
+/* ── Memory ──────────────────────────────────────────────── */
+#memory {
+color: @color6;
+}
+
+/* ── Battery ─────────────────────────────────────────────── */
+#battery {
+color: @color2;
+}
+
+#battery.warning {
+color: @color3;
+}
+
+#battery.critical {
+color: @color1;
+}
+
+#battery.charging,
+#battery.plugged {
+color: @color2;
+}
+
+/* ── Media ───────────────────────────────────────────────── */
+#custom-media {
+color: @color5;
+font-style: italic;
+padding: 2px 10px;
+}
+
+/* ── Tray ────────────────────────────────────────────────── */
+#tray {
+padding: 2px 8px;
+}
+
+#tray > .passive {
+-gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+-gtk-icon-effect: highlight;
+background-color: alpha(@color1,0.2);
+border-radius: 4px;
+}
+
+/* ── Power Button ────────────────────────────────────────── */
+#custom-power {
+color: @color1;
+font-size: 15px;
+padding: 2px 12px 2px 8px;
+margin-right: 2px;
+border-radius: 6px;
+}
+
+#custom-power:hover {
+color: @color5;
+background: alpha(@color5,0.15);
+box-shadow: 0 0 12px alpha(@color5,0.3);
+}
+
+/* ── Bluetooth ───────────────────────────────────────────── */
+#bluetooth {
+color: @color6;
+padding: 2px 10px;
+}
+
+#bluetooth.disabled {
+color: @color8;
+}

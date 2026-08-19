@@ -31,4 +31,4 @@ wal -i "$WALL" -n
 
 # Restart waybar only if it needs to pick up new colors
 pkill waybar
-/usr/bin/waybar &
+waybar -c ~/.config/hypr/waybar/config -s ~/.config/hypr/waybar/style.css &
