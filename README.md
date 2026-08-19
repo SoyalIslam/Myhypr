@@ -76,27 +76,30 @@ A modern, highly responsive, and automated **Hyprland Wayland Desktop Configurat
 
 ## 🚀 Installation & Setup
 
-1. **Clone the repository** to your local `.config` directory:
+1. **Clone the repository anywhere** (e.g. `~/Downloads`, `~/dotfiles`, or `~/.config/hypr`):
    ```bash
-   git clone https://github.com/YOUR_USERNAME/hyprland-dotfiles.git ~/.config/hypr
+   git clone https://github.com/YOUR_USERNAME/hyprland-dotfiles.git hypr-dotfiles
+   cd hypr-dotfiles
    ```
 
 2. **Make the installer executable**:
    ```bash
-   chmod +x ~/.config/hypr/install.sh
+   chmod +x install.sh
    ```
 
 3. **Run the installation script**:
    ```bash
-   cd ~/.config/hypr && ./install.sh
+   ./install.sh
    ```
 
 > ℹ️ The installer will automatically:
+> - Detect its running location and deploy dotfiles to `~/.config/hypr`.
+> - If an existing `~/.config/hypr` directory exists, it prompts for permission to create a backup (`~/.config/hypr_backup_YYYYMMDD_HHMMSS`) and overwrite it.
 > - Check for an AUR helper (`yay` or `paru`) and install `yay` if missing.
 > - Install all required official Pacman and AUR packages.
 > - Clone and configure the **adi1090x Rofi themes** into `~/.config/rofi`.
 > - Enable Systemd services (`bluetooth.service`, `NetworkManager.service`).
-> - Set executable permissions (`chmod +x`) on all helper scripts.
+> - Apply executable permissions (`chmod +x`) to all scripts in `~/.config/hypr` and `~/.config/rofi`.
 
 ---
 

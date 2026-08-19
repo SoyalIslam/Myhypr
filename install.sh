@@ -35,6 +35,38 @@ echo "================================================================="
 echo -e "${NC}"
 
 # ------------------------------------------------------------------------------
+# Script Location & Hyprland Config Auto-Deployment
+# ------------------------------------------------------------------------------
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+TARGET_DIR="$HOME/.config/hypr"
+
+if [ "$SCRIPT_DIR" != "$TARGET_DIR" ]; then
+    log_info "Installer executed from external location: ${SCRIPT_DIR}"
+    
+    if [ -d "$TARGET_DIR" ]; then
+        log_warn "Existing Hyprland configuration directory found at ${TARGET_DIR}."
+        read -p "Do you want to backup and overwrite ${TARGET_DIR}? (y/N): " overwrite_choice
+        overwrite_choice=${overwrite_choice:-N}
+        if [[ "$overwrite_choice" =~ ^[Yy]$ ]]; then
+            BACKUP_DIR="${HOME}/.config/hypr_backup_$(date +%Y%m%d_%H%M%S)"
+            log_info "Backing up existing ${TARGET_DIR} to ${BACKUP_DIR}..."
+            mv "$TARGET_DIR" "$BACKUP_DIR"
+            log_success "Backup completed."
+        else
+            log_info "Deployment skipped. Continuing installation using existing configuration..."
+        fi
+    fi
+
+    if [ ! -d "$TARGET_DIR" ]; then
+        log_info "Deploying dotfiles to ${TARGET_DIR}..."
+        mkdir -p "$TARGET_DIR"
+        cp -rf "$SCRIPT_DIR/"* "$TARGET_DIR/"
+        [ -f "$SCRIPT_DIR/.gitignore" ] && cp -f "$SCRIPT_DIR/.gitignore" "$TARGET_DIR/" 2>/dev/null || true
+        log_success "Dotfiles deployed successfully to ${TARGET_DIR}."
+    fi
+fi
+
+# ------------------------------------------------------------------------------
 # Package Lists
 # ------------------------------------------------------------------------------
 
