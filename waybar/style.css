@@ -158,7 +158,6 @@ font-size: 0.85em;
     color: @color7;
     font-size: 0.9em;
     font-style: italic;
-    max-width: 15rem;
 }
 
 #window:hover {
