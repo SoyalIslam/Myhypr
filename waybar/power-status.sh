@@ -1,9 +1,11 @@
 #!/bin/bash
 
-# Detect battery
-if ls /sys/class/power_supply/BAT* 1> /dev/null 2>&1; then
-    capacity=$(cat /sys/class/power_supply/BAT*/capacity)
-    status=$(cat /sys/class/power_supply/BAT*/status)
+# Find first available battery cleanly
+BAT=$(ls -d /sys/class/power_supply/BAT* 2>/dev/null | head -n1)
+
+if [ -n "$BAT" ] && [ -f "$BAT/capacity" ]; then
+    capacity=$(cat "$BAT/capacity" 2>/dev/null)
+    status=$(cat "$BAT/status" 2>/dev/null)
 
     if [ "$status" = "Charging" ]; then
         echo "🔌 $capacity%"

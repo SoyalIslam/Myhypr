@@ -26,9 +26,14 @@ WALL=$(find "$WALL_DIR" -type f | shuf -n 1)
 # Transition time reduced to 1.5 second to handle faster changes
 awww img "$WALL" --transition-type random --transition-duration 1.5
 
-# Generate colors (pywal can be slow, but lock prevents overlapping)
-wal -i "$WALL" -n
+# Generate colors if pywal is available
+if command -v wal >/dev/null 2>&1; then
+    wal -i "$WALL" -n
+fi
 
-# Restart waybar only if it needs to pick up new colors
-pkill waybar
-waybar -c ~/.config/hypr/waybar/config -s ~/.config/hypr/waybar/style.css &
+# Reload waybar stylesheet dynamically if running, or start it if not
+if pgrep -x waybar >/dev/null 2>&1; then
+    pkill -USR2 waybar
+else
+    waybar -c ~/.config/hypr/waybar/config -s ~/.config/hypr/waybar/style.css &
+fi

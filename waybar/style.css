@@ -1,8 +1,20 @@
-@import url("/home/gaffer/.cache/wal/colors-waybar.css");
-/* CYBERPUNK WAYBAR THEME */
-/* ============================================================
- *  CYBERPUNK WAYBAR THEME — Dynamic (Pywal)
- *  ============================================================ */
+/* CYBERPUNK WAYBAR THEME — Dynamic (Pywal with Fallbacks) */
+
+/* Default fallback colors if Pywal colors file does not exist yet */
+@define-color background #0f111a;
+@define-color foreground #e1e6f0;
+@define-color color0 #15161e;
+@define-color color1 #ff5370;
+@define-color color2 #c3e88d;
+@define-color color3 #ffcb6b;
+@define-color color4 #82aaff;
+@define-color color5 #c792ea;
+@define-color color6 #89ddff;
+@define-color color7 #eeffff;
+@define-color color8 #464b5d;
+
+/* Import Pywal colors dynamically (relative path works for any username) */
+@import url("../../../.cache/wal/colors-waybar.css");
 
 /* ── Global ───────────────────────────────────────────────── */
 * {

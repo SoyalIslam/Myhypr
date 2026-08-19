@@ -115,7 +115,7 @@
         "tooltip-format-ethernet": "󰈀  {ifname}\n󰩟  {ipaddr}/{cidr}",
         "tooltip-format-disconnected": "Disconnected",
         "max-length": 20,
-        "on-click": "alacritty -e nmtui"
+        "on-click": "sh -c 'command -v ghostty >/dev/null && ghostty -e nmtui || command -v kitty >/dev/null && kitty -e nmtui || alacritty -e nmtui'"
     },
 
     "pulseaudio": {
@@ -143,11 +143,10 @@
         "format": "󰻠  {usage}%",
         "tooltip": false,
         "interval": 2,
-        "on-click": "kitty -e btm"
+        "on-click": "sh -c 'TERM_CMD=\"ghostty\"; command -v ghostty >/dev/null || TERM_CMD=\"kitty\"; command -v kitty >/dev/null || TERM_CMD=\"alacritty\"; command -v btm >/dev/null && $TERM_CMD -e btm || $TERM_CMD -e htop'"
     },
 
     "temperature": {
-        "hwmon-path": "/sys/class/hwmon/hwmon3/temp1_input",
         "critical-threshold": 80,
         "format": "{icon}  {temperatureC}°C",
         "format-icons": ["󰔄", "󰔄", "󰔄"],
@@ -158,7 +157,7 @@
         "format": "󰍛  {percentage}%",
         "tooltip-format": "RAM: {used:0.1f}G / {total:0.1f}G\nSWAP: {swapUsed:0.1f}G / {swapTotal:0.1f}G",
         "interval": 3,
-        "on-click": "kitty -e btm"
+        "on-click": "sh -c 'TERM_CMD=\"ghostty\"; command -v ghostty >/dev/null || TERM_CMD=\"kitty\"; command -v kitty >/dev/null || TERM_CMD=\"alacritty\"; command -v btm >/dev/null && $TERM_CMD -e btm || $TERM_CMD -e htop'"
     },
 
     "tray": {
