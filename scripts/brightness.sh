@@ -1,47 +1,79 @@
 #!/bin/bash
 
-# Files for state
+# State & notifications
 STATE_FILE="/tmp/brightness_val"
 LOCK_FILE="/tmp/brightness_hw.lock"
-# Constant notification ID to prevent "refreshing" animation
 NOTIF_ID=25632
 
-# 1. Initialize if not exists (first run only)
-if [ ! -f "$STATE_FILE" ]; then
-    ddcutil getvcp 10 --bus 2 --brief | awk '{print $4}' > "$STATE_FILE"
-fi
+# Adjust brightness using brightnessctl (laptop / sysfs backlight)
+use_brightnessctl() {
+    local change="$1"
+    brightnessctl set "$change" >/dev/null 2>&1
+    local current
+    current=$(brightnessctl -m 2>/dev/null | cut -d',' -f4 | tr -d '%')
+    echo "${current:-50}"
+}
 
-# 2. Get current value from file
-val=$(cat "$STATE_FILE")
+# Adjust brightness using ddcutil (external monitors)
+use_ddcutil() {
+    local change="$1"
+    
+    # Auto-detect ddcutil bus if not cached
+    local bus_file="/tmp/ddcutil_bus"
+    local bus=""
+    if [ -f "$bus_file" ]; then
+        bus=$(cat "$bus_file" 2>/dev/null)
+    fi
+    if [ -z "$bus" ]; then
+        bus=$(ddcutil detect 2>/dev/null | awk '/I2C bus:/ {print $3}' | grep -o '[0-9]*' | head -n1)
+        [ -n "$bus" ] && echo "$bus" > "$bus_file"
+    fi
+    bus="${bus:-2}"
 
-# 3. Update value based on input
-if [ "$1" == "+" ]; then
-    val=$((val + 5))
+    if [ ! -f "$STATE_FILE" ]; then
+        local init_val
+        init_val=$(ddcutil getvcp 10 --bus "$bus" --brief 2>/dev/null | awk '{print $4}')
+        echo "${init_val:-50}" > "$STATE_FILE"
+    fi
+
+    local val
+    val=$(cat "$STATE_FILE" 2>/dev/null)
+    val=${val:-50}
+
+    if [ "$change" == "+" ]; then
+        val=$((val + 5))
+    else
+        val=$((val - 5))
+    fi
+
+    [ $val -gt 100 ] && val=100
+    [ $val -lt 0 ] && val=0
+
+    echo "$val" > "$STATE_FILE"
+
+    (
+        flock -x 9
+        local target
+        target=$(cat "$STATE_FILE" 2>/dev/null)
+        ddcutil --bus "$bus" setvcp 10 "$target" --noverify --brief > /dev/null 2>&1
+    ) 9>"$LOCK_FILE" &
+
+    echo "$val"
+}
+
+# 1. Determine controller: sysfs backlight (laptop) vs ddcutil (desktop monitor)
+max_b=$(brightnessctl m 2>/dev/null || echo 0)
+if [ "$max_b" -gt 1 ]; then
+    if [ "$1" == "+" ]; then
+        new_val=$(use_brightnessctl "5%+")
+    else
+        new_val=$(use_brightnessctl "5%-")
+    fi
+elif command -v ddcutil >/dev/null 2>&1; then
+    new_val=$(use_ddcutil "$1")
 else
-    val=$((val - 5))
+    new_val=50
 fi
 
-# 4. Clamp between 0 and 100
-[ $val -gt 100 ] && val=100
-[ $val -lt 0 ] && val=0
-
-# 5. Save back to file IMMEDIATELY
-echo "$val" > "$STATE_FILE"
-
-# 6. Update the OSD (Bar) IMMEDIATELY
-# Using -r (replace) with a fixed ID is the smoothest way in Dunst
-dunstify -u low -r "$NOTIF_ID" -h string:x-dunst-stack-tag:brightness -h int:value:"$val" "Brightness" "$val%" -t 1500
-
-# 7. Sync with hardware in background
-# This part is slow (~0.5s), so we run it in a subshell
-(
-  # Wait for current hardware sync to finish, then set the latest value
-  # We use flock to ensure we don't spam the I2C bus
-  flock -x 9
-  
-  # Read the LATEST target (might have changed while we waited for lock)
-  TARGET=$(cat "$STATE_FILE")
-  
-  # Set hardware brightness (brief and noverify for speed)
-  ddcutil --bus 2 setvcp 10 "$TARGET" --noverify --brief > /dev/null 2>&1
-) 9>"$LOCK_FILE" &
+# 2. Display OSD Notification via Dunst
+dunstify -u low -r "$NOTIF_ID" -h string:x-dunst-stack-tag:brightness -h int:value:"${new_val:-50}" "Brightness" "${new_val:-50}%" -t 1500
