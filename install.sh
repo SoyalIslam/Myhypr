@@ -175,6 +175,44 @@ else
 fi
 
 # ------------------------------------------------------------------------------
+# Rofi Themes Setup (adi1090x/rofi)
+# ------------------------------------------------------------------------------
+log_info "Setting up Rofi themes..."
+ROFI_CONFIG_DIR="$HOME/.config/rofi"
+
+if [ ! -d "$ROFI_CONFIG_DIR/launchers" ]; then
+    log_info "Cloning and installing Rofi themes from adi1090x/rofi..."
+    ROFI_TMP_DIR=$(mktemp -d)
+    if git clone --depth=1 https://github.com/adi1090x/rofi.git "$ROFI_TMP_DIR"; then
+        mkdir -p "$ROFI_CONFIG_DIR"
+        cp -rf "$ROFI_TMP_DIR/files/"* "$ROFI_CONFIG_DIR/"
+        log_success "Rofi themes installed successfully."
+    else
+        log_warn "Failed to clone Rofi themes repository."
+    fi
+    rm -rf "$ROFI_TMP_DIR"
+else
+    log_info "Rofi config directory already exists."
+fi
+
+# Ensure default theme is set in config.rasi
+if [ -f "$ROFI_CONFIG_DIR/config.rasi" ]; then
+    if ! grep -q "@theme" "$ROFI_CONFIG_DIR/config.rasi"; then
+        echo '@theme "~/.config/rofi/launchers/type-1/style-8.rasi"' >> "$ROFI_CONFIG_DIR/config.rasi"
+    fi
+fi
+
+# Fix launcher script flags and permissions
+if [ -f "$ROFI_CONFIG_DIR/launchers/type-1/launcher.sh" ]; then
+    sed -i 's/-dmenu/-show drun/g' "$ROFI_CONFIG_DIR/launchers/type-1/launcher.sh"
+fi
+
+log_info "Setting executable permissions on all helper scripts..."
+find "$ROFI_CONFIG_DIR" -type f -name "*.sh" -exec chmod +x {} + 2>/dev/null || true
+find "$HOME/.config/hypr" -type f -name "*.sh" -exec chmod +x {} + 2>/dev/null || true
+log_success "Executable permissions applied."
+
+# ------------------------------------------------------------------------------
 # Service Configuration & Enablement
 # ------------------------------------------------------------------------------
 log_info "Enabling systemd services..."
