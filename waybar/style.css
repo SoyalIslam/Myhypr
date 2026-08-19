@@ -19,7 +19,7 @@
 /* ── Global ───────────────────────────────────────────────── */
 * {
     font-family: "Share Tech Mono", "JetBrains Mono Nerd Font", monospace;
-    font-size: 13px;
+    font-size: 10.5pt;
     border: none;
     border-radius: 0;
     min-height: 0;
@@ -39,9 +39,9 @@ window#waybar.hidden {
 tooltip {
     background: @background;
     border: 1px solid @color4;
-    border-radius: 4px;
+    border-radius: 0.3em;
     color: @foreground;
-    padding: 6px 10px;
+    padding: 0.4em 0.7em;
 }
 
 tooltip label {
@@ -54,8 +54,8 @@ tooltip label {
 .modules-right {
     background: alpha(@background, 0.92);
     border: 1px solid alpha(@color4, 0.25);
-    border-radius: 8px;
-    padding: 2px 6px;
+    border-radius: 0.6em;
+    padding: 0.15em 0.4em;
     box-shadow:
     0 0 10px alpha(@color4, 0.1),
     inset 0 1px 0 alpha(@color4, 0.05);
@@ -79,7 +79,7 @@ tooltip label {
 #tray,
 #bluetooth,
 #custom-clipboard {
-padding: 2px 10px;
+padding: 0.15em 0.6em;
 color: @foreground;
 transition: all 0.2s ease;
 }
@@ -87,15 +87,15 @@ transition: all 0.2s ease;
 /* ── Logo ─────────────────────────────────────────────────── */
 #custom-logo {
 color: @color6;
-font-size: 16px;
-padding: 2px 12px 2px 8px;
+font-size: 1.2em;
+padding: 0.15em 0.8em 0.15em 0.5em;
 }
 
 /* ── Separator ────────────────────────────────────────────── */
 #custom-separator {
 color: alpha(@foreground,0.25);
-padding: 2px 4px;
-font-size: 11px;
+padding: 0.15em 0.3em;
+font-size: 0.85em;
 }
 
 /* ── Workspaces ───────────────────────────────────────────── */
@@ -104,13 +104,13 @@ font-size: 11px;
 }
 
 #workspaces button {
-    padding: 0 4px;
-    margin: 0 2px;
+    padding: 0 0.3em;
+    margin: 0 0.15em;
     color: @color8;
     background: transparent;
-    border-radius: 4px;
-    font-size: 14px;
-    min-width: 28px;
+    border-radius: 0.3em;
+    font-size: 1.1em;
+    min-width: 2em;
 }
 
 #workspaces button:hover {

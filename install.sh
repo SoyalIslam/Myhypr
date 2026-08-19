@@ -87,7 +87,6 @@ PACMAN_PKGS=(
     expac
     reflector
     meld
-    tldr
     tree
     rsync
 
