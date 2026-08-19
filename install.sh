@@ -47,7 +47,7 @@ PACMAN_PKGS=(
     hyprpicker
     waybar
     dunst
-    rofi
+    rofi-wayland
     polkit-gnome
     xdg-desktop-portal-hyprland
     xdg-desktop-portal-gtk
@@ -71,8 +71,8 @@ PACMAN_PKGS=(
     pavucontrol
     playerctl
     bottom
-    btop
     htop
+    lm_sensors
     fastfetch
     mpv
     vlc
