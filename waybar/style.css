@@ -156,8 +156,9 @@ font-size: 0.85em;
 /* ── Active Window ────────────────────────────────────────── */
 #window {
     color: @color7;
-    font-size: 12px;
+    font-size: 0.9em;
     font-style: italic;
+    max-width: 15rem;
 }
 
 #window:hover {
@@ -165,11 +166,21 @@ font-size: 0.85em;
 }
 
 /* ── Center (Clock Section) ───────────────────────────────── */
+.modules-left {
+    margin-right: 0.5rem;
+}
+
 .modules-center {
+    margin-left: 1rem;
+    margin-right: 1rem;
     border-color: alpha(@color5,0.3);
     box-shadow:
     0 0 14px alpha(@color5,0.15),
     inset 0 1px 0 alpha(@color5,0.08);
+}
+
+.modules-right {
+    margin-left: 0.5rem;
 }
 
 #clock {
