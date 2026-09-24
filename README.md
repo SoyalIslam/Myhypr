@@ -78,8 +78,8 @@ A modern, highly responsive, and automated **Hyprland Wayland Desktop Configurat
 
 1. **Clone the repository anywhere** (e.g. `~/Downloads`, `~/dotfiles`, or `~/.config/hypr`):
    ```bash
-   git clone https://github.com/YOUR_USERNAME/hyprland-dotfiles.git hypr-dotfiles
-   cd hypr-dotfiles
+   git clone https://github.com/SoyalIslam/Myhypr.git
+   cd Myhypr
    ```
 
 2. **Make the installer executable**:
