@@ -36,6 +36,11 @@ elif [ -x "$HOME/.local/bin/wal" ]; then
     "$HOME/.local/bin/wal" -i "$WALL" -n
 fi
 
+# Update dunst notification theme to match pywal colors
+if [ -x "$HOME/.config/hypr/scripts/dunst_theme.sh" ]; then
+    "$HOME/.config/hypr/scripts/dunst_theme.sh" &
+fi
+
 # Reload waybar stylesheet dynamically if running, or start it if not
 if pgrep -x waybar >/dev/null 2>&1; then
     pkill -USR2 waybar
