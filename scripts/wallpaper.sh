@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Ensure PATH includes ~/.local/bin
+export PATH="$HOME/.local/bin:$PATH"
+
 LOCK_FILE="/tmp/wallpaper_change.lock"
 
 if [ -f "$LOCK_FILE" ]; then
@@ -29,6 +32,8 @@ awww img "$WALL" --transition-type random --transition-duration 1.5
 # Generate colors if pywal is available
 if command -v wal >/dev/null 2>&1; then
     wal -i "$WALL" -n
+elif [ -x "$HOME/.local/bin/wal" ]; then
+    "$HOME/.local/bin/wal" -i "$WALL" -n
 fi
 
 # Reload waybar stylesheet dynamically if running, or start it if not

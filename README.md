@@ -64,7 +64,7 @@ A modern, highly responsive, and automated **Hyprland Wayland Desktop Configurat
 - `waybar`, `dunst`, `rofi-wayland`, `polkit-gnome`
 - `ghostty`, `kitty`, `alacritty`
 - `thunar`, `brightnessctl`, `ddcutil`, `pavucontrol`, `playerctl`
-- `python-pywal`, `lm_sensors`, `bottom`, `fastfetch`
+- `python-pipx`, `imagemagick`, `lm_sensors`, `bottom`, `fastfetch`
 - `ttf-jetbrains-mono-nerd`, `noto-fonts`, `noto-fonts-emoji`
 
 ### AUR Packages

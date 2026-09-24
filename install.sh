@@ -147,9 +147,10 @@ PACMAN_PKGS=(
     fastfetch
     mpv
     vlc
-    python-pywal
-    jq
     python
+    python-pipx
+    imagemagick
+    jq
 
     # --------------------------------------------------------------------------
     # CLI Tools
