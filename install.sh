@@ -203,6 +203,7 @@ AUR_PKGS=(
     cursor-clip-git
     bibata-cursor-theme
     rofi-power-menu
+    baobab
 )
 
 # ------------------------------------------------------------------------------
