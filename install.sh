@@ -9,6 +9,8 @@
 #   - Uses pacman -Syu instead of pacman -Sy
 #   - Backs up existing Hyprland configuration
 #   - Logs installation results
+#   - Sets up Pywal
+#   - Generates Pywal colors from the default wallpaper
 #   - Prints a final success/failure summary
 # ==============================================================================
 
@@ -216,6 +218,12 @@ ALREADY_INSTALLED_AUR_PKGS=()
 FAILED_AUR_PKGS=()
 
 # ------------------------------------------------------------------------------
+# Pywal Status
+# ------------------------------------------------------------------------------
+
+PYWAL_STATUS="not_installed"
+
+# ------------------------------------------------------------------------------
 # Check sudo
 # ------------------------------------------------------------------------------
 
@@ -275,7 +283,6 @@ if [ "$SCRIPT_DIR" != "$TARGET_DIR" ]; then
 
         mkdir -p "$TARGET_DIR"
 
-        # Copy normal files/directories
         cp -rf "$SCRIPT_DIR"/. "$TARGET_DIR"/
 
         log_success "Hyprland configuration deployed."
@@ -359,7 +366,6 @@ log_section "Installing Official Repository Packages"
 
 for pkg in "${AVAILABLE_PKGS[@]}"; do
 
-    # Already installed?
     if pacman -Q "$pkg" &>/dev/null; then
 
         log_info "$pkg is already installed."
@@ -504,6 +510,174 @@ else
     FAILED_AUR_PKGS=("${AUR_PKGS[@]}")
 
 fi
+
+# ------------------------------------------------------------------------------
+# Pywal Setup
+# ------------------------------------------------------------------------------
+
+log_section "Pywal Setup"
+
+IMAGE="$HOME/.config/hypr/wallpapers/sea1.jpg"
+PYWAL_STATUS="not_installed"
+
+# ------------------------------------------------------------------------------
+# Check for Pywal
+# ------------------------------------------------------------------------------
+
+log_info "Checking for Pywal (wal)..."
+
+# pipx installs user applications in ~/.local/bin. Add it to PATH for this
+# script immediately so a newly-installed wal can be used without restarting
+# the terminal.
+if [ -d "$HOME/.local/bin" ]; then
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+
+if command -v wal &>/dev/null; then
+
+    WAL_PATH="$(command -v wal)"
+    log_success "Pywal found: $WAL_PATH"
+    PYWAL_STATUS="already_installed"
+
+else
+
+    log_warn "Pywal (wal) is not installed."
+    log_info "Installing Pywal with pipx..."
+
+    # --------------------------------------------------------------------------
+    # Install pipx if necessary
+    # --------------------------------------------------------------------------
+
+    if ! command -v pipx &>/dev/null; then
+
+        log_info "pipx not found. Installing python-pipx..."
+
+        if sudo pacman -S --needed --noconfirm python-pipx; then
+            log_success "python-pipx installed."
+        else
+            log_error "Failed to install python-pipx."
+            PYWAL_STATUS="failed"
+        fi
+
+    fi
+
+    # --------------------------------------------------------------------------
+    # Install Pywal
+    # --------------------------------------------------------------------------
+
+    if [ "$PYWAL_STATUS" != "failed" ] && command -v pipx &>/dev/null; then
+
+        # Refresh pipx PATH in case pipx was installed during this run.
+        export PATH="$HOME/.local/bin:$PATH"
+
+        if pipx list 2>/dev/null | grep -qE 'package (pywal|pywal16)'; then
+
+            log_info "Pywal is already installed through pipx."
+
+        else
+
+            if pipx install pywal; then
+                log_success "Pywal installed successfully."
+            else
+                log_error "Failed to install Pywal."
+                PYWAL_STATUS="failed"
+            fi
+
+        fi
+
+    elif [ "$PYWAL_STATUS" != "failed" ]; then
+
+        log_error "pipx is unavailable."
+        PYWAL_STATUS="failed"
+
+    fi
+
+fi
+
+# ------------------------------------------------------------------------------
+# Refresh PATH and locate wal after installation
+# ------------------------------------------------------------------------------
+
+export PATH="$HOME/.local/bin:$PATH"
+
+if command -v wal &>/dev/null; then
+    WAL_PATH="$(command -v wal)"
+    log_success "Pywal executable: $WAL_PATH"
+else
+    log_error "Pywal executable (wal) could not be found."
+    log_error "Expected location: $HOME/.local/bin/wal"
+    PYWAL_STATUS="failed"
+fi
+
+# ------------------------------------------------------------------------------
+# Generate Pywal Colors
+# ------------------------------------------------------------------------------
+
+if [ "$PYWAL_STATUS" != "failed" ] && command -v wal &>/dev/null; then
+
+    if [ -f "$IMAGE" ]; then
+
+        log_info "Generating Pywal colors..."
+        log_info "Wallpaper: $IMAGE"
+
+        # Run synchronously. Waybar must not start before Pywal has generated
+        # its color files.
+        if "$WAL_PATH" -i "$IMAGE"; then
+
+            log_success "Pywal colors generated successfully."
+
+            # Verify the cache and Waybar color file.
+            if [ -d "$HOME/.cache/wal" ]; then
+                log_success "Pywal cache created: $HOME/.cache/wal"
+            else
+                log_error "Pywal finished but ~/.cache/wal was not created."
+                PYWAL_STATUS="failed"
+            fi
+
+            if [ -f "$HOME/.cache/wal/colors-waybar.css" ]; then
+                log_success "Waybar Pywal colors created: ~/.cache/wal/colors-waybar.css"
+            else
+                log_warn "colors-waybar.css was not generated."
+                log_warn "Waybar may need a matching Pywal template/configuration."
+            fi
+
+        else
+
+            log_error "Pywal color generation failed."
+            PYWAL_STATUS="failed"
+
+        fi
+
+    else
+
+        log_error "Wallpaper not found:"
+        echo "       $IMAGE"
+        log_error "Cannot generate Pywal colors."
+        PYWAL_STATUS="failed"
+
+    fi
+
+else
+
+    log_error "Skipping Pywal color generation because wal is unavailable."
+
+fi
+
+# ------------------------------------------------------------------------------
+# Pywal Summary
+# ------------------------------------------------------------------------------
+
+case "$PYWAL_STATUS" in
+    already_installed)
+        log_success "Pywal setup completed using the existing installation."
+        ;;
+    failed)
+        log_error "Pywal setup failed."
+        ;;
+    *)
+        log_success "Pywal setup completed."
+        ;;
+esac
 
 # ------------------------------------------------------------------------------
 # Rofi Themes
@@ -732,6 +906,33 @@ echo -e "${BLUE}AUR packages already installed:${NC} ${#ALREADY_INSTALLED_AUR_PK
 echo -e "${RED}AUR packages failed:${NC} ${#FAILED_AUR_PKGS[@]}"
 
 # ------------------------------------------------------------------------------
+# Pywal Summary
+# ------------------------------------------------------------------------------
+
+echo
+echo -e "${CYAN}Pywal status:${NC}"
+
+case "$PYWAL_STATUS" in
+
+    installed)
+        echo -e "${GREEN}Pywal:${NC} Installed during this run"
+        ;;
+
+    already_installed)
+        echo -e "${BLUE}Pywal:${NC} Already installed"
+        ;;
+
+    failed)
+        echo -e "${RED}Pywal:${NC} Installation failed"
+        ;;
+
+    *)
+        echo -e "${YELLOW}Pywal:${NC} Not installed"
+        ;;
+
+esac
+
+# ------------------------------------------------------------------------------
 # Failed Official Packages
 # ------------------------------------------------------------------------------
 
@@ -785,7 +986,8 @@ echo -e "${CYAN}================================================================
 
 if [ ${#FAILED_PKGS[@]} -eq 0 ] &&
    [ ${#UNAVAILABLE_PKGS[@]} -eq 0 ] &&
-   [ ${#FAILED_AUR_PKGS[@]} -eq 0 ]; then
+   [ ${#FAILED_AUR_PKGS[@]} -eq 0 ] &&
+   [ "$PYWAL_STATUS" != "failed" ]; then
 
     echo -e "${GREEN}        Installation completed successfully!${NC}"
 
@@ -806,4 +1008,3 @@ echo
 log_info "You can now reboot and start Hyprland."
 
 echo
-
