@@ -21,7 +21,7 @@
 
     "modules-center": [
         "custom/time_left",
-        "hyprland/workspaces",
+        "ext/workspaces",
         "custom/time_right"
     ],
 
@@ -41,7 +41,7 @@
         "custom/power"
     ],
 
-    "hyprland/workspaces": {
+    "ext/workspaces": {
         "format": "{icon}",
         "on-click": "activate",
         "format-icons": {
@@ -58,10 +58,7 @@
             "active": "󰮯",
             "default": "󰊠"
         },
-        "sort-by-number": true,
-        "persistent-workspaces": {
-            "*": [1, 2, 3, 4]
-        }
+        "sort-by-id": true
     },
 
     "hyprland/window": {

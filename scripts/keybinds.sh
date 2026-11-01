@@ -3,33 +3,8 @@
 # Define the rofi theme to use
 ROFI_THEME="$HOME/.config/rofi/launchers/type-1/style-8.rasi"
 
-# Get keybindings from hyprctl, convert to valid JSON via Python, format them, and map to simple, friendly names
-hyprctl binds | python3 -c '
-import sys, json
-
-binds = []
-current = {}
-for line in sys.stdin:
-    stripped = line.strip()
-    if stripped.startswith("bind") and ":" not in stripped:
-        if current:
-            binds.append(current)
-            current = {}
-    elif ":" in stripped:
-        k, v = stripped.split(":", 1)
-        k = k.strip()
-        v = v.strip()
-        if k == "modmask":
-            try:
-                v = int(v)
-            except ValueError:
-                v = 0
-        current[k] = v
-if current:
-    binds.append(current)
-
-print(json.dumps(binds))
-' | jq -r '
+# Get keybindings from hyprctl (JSON natively supported in 0.57+)
+hyprctl binds -j | jq -r '
 .[] | 
 # Filter out empty keys
 select(.key != "") |
@@ -43,7 +18,9 @@ select(.key != "") |
  (.key | if . == "left" then "Left" elif . == "right" then "Right" elif . == "up" then "Up" elif . == "down" then "Down" else . end) as $k |
 
  "\($m)\(if $m == "" then "" else " + " end)\($k) -> " + 
- (if .dispatcher == "exec" then 
+ (if .description != "" and .description != null then 
+    .description
+  elif .dispatcher == "exec" or (.dispatcher | test("exec")) then 
     (.arg | 
      if contains("type-2/launcher.sh") then "Apps" 
      elif contains("type-1/launcher.sh") then "Binds" 
@@ -61,27 +38,30 @@ select(.key != "") |
      elif contains("btm") then "System Usage"
      elif contains("fastfetch") then "System Info"
      elif contains("kitty") then "Terminal"
+     elif contains("ghostty") then "Terminal"
      elif contains("dolphin") then "Files"
+     elif contains("thunar") then "Files"
      elif contains("brave") then "Web"
      elif contains("dunstctl close-all") then "Clear Notifications"
      elif contains("swappy") then "Edit Screenshot"
      elif contains("playerctl next") then "Next Track"
      elif contains("playerctl previous") then "Prev Track"
      elif contains("playerctl play-pause") then "Play/Pause"
+     elif contains("toggle_mangohud.sh") then "Toggle MangoHud"
      elif contains("wpctl set-volume") then "Volume Control"
      elif contains("wpctl set-mute") then "Mute Toggle"
      else . end
     ) 
-  elif .dispatcher == "workspace" then 
+  elif .dispatcher == "workspace" or (.dispatcher | test("workspace")) then 
     (if .arg == "magic" then "Magic Workspace" elif .arg | startswith("e") then "Cycle Workspaces" else "Go to Workspace \(.arg)" end)
   elif .dispatcher == "togglespecialworkspace" then 
     (if .arg == "magic" then "Magic Workspace" else "Special Workspace \(.arg)" end)
   elif .dispatcher == "movetoworkspace" then "Move to Workspace \(.arg)"
-  elif .dispatcher == "movefocus" then "Focus \($k)"
-  elif .dispatcher == "movewindow" then "Move Window \($k)"
-  elif .dispatcher == "killactive" then "Close Window"
+  elif .dispatcher == "movefocus" or (.dispatcher | test("focus")) then "Focus \($k)"
+  elif .dispatcher == "movewindow" or (.dispatcher | test("move")) then "Move Window \($k)"
+  elif .dispatcher == "killactive" or (.dispatcher | test("close")) then "Close Window"
   elif .dispatcher == "exit" then "Quit Hyprland"
-  elif .dispatcher == "togglefloating" then "Float Window"
+  elif .dispatcher == "togglefloating" or (.dispatcher | test("float")) then "Float Window"
   elif .dispatcher == "fullscreen" then "Full Screen"
   elif .dispatcher == "togglesplit" then "Split Layout"
   elif .dispatcher == "pseudo" then "Pseudo Tiling"
